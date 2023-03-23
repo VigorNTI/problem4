@@ -67,4 +67,72 @@ def b_to_b10(num, base):
     # Return the new number
     return o
 
-print(b10_to_b(b_to_b10(i_num, i_base), o_base))
+def b_to_b10_f(num, base):
+    o = 0
+    i = 0
+    for d in num:
+        # Convert the digit from whatever base it is into an integer
+        try:
+            # If the digit already is a number, just convert it to an int
+            d = int(d)
+        except:
+            # If the digit is a letter, we remove 55 from it's ascii integer
+            # representation to get the new number, i.e 'A' in the ascii table
+            # is 65, we remove 55 and get 10, which is the next number after 9.
+            d = ord(d.upper()) - 55
+        # This is basically the same algorithm as above, but with negative
+        # exponents for the floating point digits, for example:
+        # 13.21(base 16) = (1*16**1) + (3*16**0) + (2*16**-1) + (1*16**-2) = 19.21890625
+        # above example includes the integer part however is not included in
+        # this function since it's only for the floating part. As a side note
+        # there could be a better implementation for the b_to_b10 function to
+        # handle floating points as well, just decrement the exponents as we
+        # travel through the number. This would eliminate the need for two
+        # functions. However I decided to keep it separated for simplicity.
+        o += base**-(i + 1) * d
+        # Move to the next digit
+        i += 1
+    return o
+
+def b10_to_b_f(num, base):
+    out_deq = deque("")
+    # Max number of decimals
+    limit = 10
+
+    # Convert the string to a float
+    f = float(num)
+    for i in range(limit):
+        # Remove the integer part and continue with the decimal part
+        f = f - int(f)
+        # multiply with the new base and keep the rest for next digit 
+        f *= base
+        out_deq.append(int(f))
+
+    # Convert the array of numbers to a string while converting numbers above 9 to a letter:
+    # e.g: [1, 15] => 1F
+    out = ""
+    for e in out_deq:
+        out += letters[e]
+    return out
+
+
+def convert(i_n, i_b, o_b):
+    # Check if the input is a floating point or not
+    if '.' in i_n:
+        # If it is a floating point run the normal algorithm on the integer part
+        bef, aft = i_n.split('.')
+
+        # Integer part
+        bef = b_to_b10(bef, i_b)
+        bef = b10_to_b(bef, o_b)
+
+        # Decimal part - different algorithm, could be interpreted as the
+        # opposite of the normal algorithm, check the functions for clarification
+        aft = b_to_b10_f(aft, i_b)
+        aft = b10_to_b_f(aft, o_b)
+        return bef + '.' + aft
+    else: 
+        # If it is not a floating point just run the normal algorithm
+        return b10_to_b(b_to_b10(i_n, i_b), o_b)
+
+print(convert(i_num, i_base, o_base))
