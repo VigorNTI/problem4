@@ -31,23 +31,40 @@ def b10_to_b(num, base):
 
     # Convert the array of numbers to a string while converting numbers above 9 to a letter:
     # e.g: [1, 15] => 1F
+    # I could have used the ascii table like I did in the b_to_b10 function to
+    # convert numbers to letters but I didn't think of it then. This limits the
+    # usable characters to A-Z which limits the base output to 36, 0-10 + A-Z
+    # which I do find reasonable
     out = ""
     for e in out_deq:
         out += letters[e]
     return out
 
 def b_to_b10(num, base):
+    # Convert the digits of the number string to a list of digits
     l = list(num)
+    # We start the algorithm from the end so reverse the list is easiest
     l.reverse()
+    # Set the output number variable and the digit place variable
     o = 0
     i = 0
     for d in l:
+        # Convert the digit from whatever base it is into an integer
         try:
+            # If the digit already is a number, just convert it to an int
             d = int(d)
         except:
+            # If the digit is a letter, we remove 55 from it's ascii integer
+            # representation to get the new number, i.e 'A' in the ascii table
+            # is 65, we remove 55 and get 10, which is the next number after 9.
             d = ord(d.upper()) - 55
+        # This is the algorithm, multiply each digit with it's base to the power
+        # of it's digit place. For example 7061 in base 8 to base 10:
+        # 7061(base 8) = (7*8**3) + (0*8**2) + (6*8**1) + (1*8**0) = 3633
         o += d*(base**i)
+        # Go to the next digit
         i += 1
+    # Return the new number
     return o
 
 print(b10_to_b(b_to_b10(i_num, i_base), o_base))
